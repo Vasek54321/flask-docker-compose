@@ -1,0 +1,32 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile-flask
+    volumes:
+      - "./:/app:z"
+      - "/etc/localtime:/etc/localtime:ro"
+    command: gunicorn app.wsgi:application --bind 0.0.0.0:5000
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    #environment:
+    #  SQLALCHEMY_DATABASE_URI: 'mysql+pymysql://root:example@db/flask'
+        
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_DATABASE: flask
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
